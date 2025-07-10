@@ -12,65 +12,82 @@
   <!-- Posts Grid -->
   <div class="container mx-auto p-4">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <% @trending_posts.each do |post| %>
-        <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300">
-          <div class="card-body">
-            <!-- Header -->
-            <div class="flex items-center gap-3 mb-4">
-              <div class="avatar placeholder">
-                <div class="bg-primary text-primary-content rounded-full w-10">
-                  <span class="text-xs">r/<%= post[:subreddit][0..2] %></span>
+      <% if @trending_posts.present? %>
+        <% @trending_posts.each do |post| %>
+          <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300">
+            <div class="card-body">
+              <!-- Header -->
+              <div class="flex items-center gap-3 mb-4">
+                <div class="avatar placeholder">
+                  <div class="bg-primary text-primary-content rounded-full w-10">
+                    <span class="text-xs">
+                      r/<%= (post.is_a?(Hash) ? post[:subreddit] : post.subreddit&.name || 'unknown')[0..2] %>
+                    </span>
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-sm font-semibold text-base-content">
+                    r/<%= post.is_a?(Hash) ? post[:subreddit] : post.subreddit&.name || 'unknown' %>
+                  </h3>
+                  <p class="text-xs text-base-content/60">
+                    by <%= post.is_a?(Hash) ? post[:author] : post.author || 'unknown' %>
+                  </p>
+                </div>
+                <div class="text-right">
+                  <div class="badge badge-outline badge-sm">
+                    <%= post.is_a?(Hash) ? time_ago_in_words(post[:post_created_at]) : time_ago_in_words(post.created_at) %> ago
+                  </div>
                 </div>
               </div>
-              <div class="flex-1">
-                <h3 class="text-sm font-semibold text-base-content">r/<%= post[:subreddit] %></h3>
-                <p class="text-xs text-base-content/60">by <%= post[:author] %></p>
-              </div>
-              <div class="text-right">
-                <div class="badge badge-outline badge-sm">
-                  <%= time_ago_in_words(post[:post_created_at]) %> ago
+
+              <!-- Title -->
+              <h2 class="card-title text-lg leading-tight">
+                <a href="<%= post.is_a?(Hash) ? post[:url] : post.url %>" target="_blank" class="link link-primary hover:link-primary-focus">
+                  <%= post.is_a?(Hash) ? post[:title] : post.title %>
+                </a>
+              </h2>
+
+              <!-- Stats -->
+              <div class="flex flex-wrap gap-2 mt-4">
+                <div class="badge badge-primary gap-1">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M3 10a7 7 0 1114 0A7 7 0 013 10zm7-4a1 1 0 100 2 1 1 0 000-2zm-2 7a1 1 0 112 0v1a1 1 0 11-2 0v-1z"/>
+                  </svg>
+                  <%= (post.is_a?(Hash) ? post[:score] : post.score) || 0 %> pts
+                </div>
+                <div class="badge badge-secondary gap-1">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M18 10c0 3.866-3.582 7-8 7a8.96 8.96 0 01-4.688-1.313l-3.01.753a1 1 0 01-1.212-1.212l.753-3.01A8.96 8.96 0 012 10c0-4.418 3.134-8 7-8s8 3.582 8 8z"/>
+                  </svg>
+                  <%= (post.is_a?(Hash) ? post[:comments_count] : post.comments_count) || 0 %> comments
+                </div>
+                <div class="badge badge-accent gap-1">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11V7a1 1 0 10-2 0v1a1 1 0 102 0zm-1 4a1 1 0 100 2 1 1 0 000-2z"/>
+                  </svg>
+                  <%= (((post.is_a?(Hash) ? post[:upvote_ratio] : post.upvote_ratio) || 0) * 100).round %> % upvotes
                 </div>
               </div>
-            </div>
 
-            <!-- Title -->
-            <h2 class="card-title text-lg leading-tight">
-              <a href="<%= post[:url] %>" target="_blank" class="link link-primary hover:link-primary-focus">
-                <%= post[:title] %>
-              </a>
-            </h2>
-
-            <!-- Stats -->
-            <div class="flex flex-wrap gap-2 mt-4">
-              <div class="badge badge-primary gap-1">
-                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M3 10a7 7 0 1114 0A7 7 0 013 10zm7-4a1 1 0 100 2 1 1 0 000-2zm-2 7a1 1 0 112 0v1a1 1 0 11-2 0v-1z"/>
-                </svg>
-                <%= post[:score] %> pts
-              </div>
-              <div class="badge badge-secondary gap-1">
-                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M18 10c0 3.866-3.582 7-8 7a8.96 8.96 0 01-4.688-1.313l-3.01.753a1 1 0 01-1.212-1.212l.753-3.01A8.96 8.96 0 012 10c0-4.418 3.134-8 7-8s8 3.582 8 8z"/>
-                </svg>
-                <%= post[:comments_count] %> comments
-              </div>
-              <div class="badge badge-accent gap-1">
-                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11V7a1 1 0 10-2 0v1a1 1 0 102 0zm-1 4a1 1 0 100 2 1 1 0 000-2z"/>
-                </svg>
-                <%= (post[:upvote_ratio] * 100).round %>% upvotes
+              <!-- Action -->
+              <div class="card-actions justify-end mt-4">
+                <a href="<%= post.is_a?(Hash) ? post[:url] : post.url %>" target="_blank" class="btn btn-primary btn-sm">
+                  View on Reddit
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                  </svg>
+                </a>
               </div>
             </div>
-
-            <!-- Action -->
-            <div class="card-actions justify-end mt-4">
-              <a href="<%= post[:url] %>" target="_blank" class="btn btn-primary btn-sm">
-                View on Reddit
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                </svg>
-              </a>
-            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="col-span-full text-center py-12">
+          <div class="alert alert-info">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>No trending posts available. Try running the fetch task or check back later.</span>
           </div>
         </div>
       <% end %>
